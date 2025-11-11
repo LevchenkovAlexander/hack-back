@@ -2,7 +2,7 @@
 FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 COPY . .
-RUN mvnw clean package -DskipTests  # Maven wrapper, или mvn
+RUN mvn clean package -DskipTests  # Maven wrapper, или mvn
 
 # Запуск
 FROM eclipse-temurin:21-jre-alpine

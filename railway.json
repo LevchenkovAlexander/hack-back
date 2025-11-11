@@ -1,0 +1,7 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "maven:3.9-eclipse-temurin-21"
+  },
+  "start": "java -jar target/demo-1.0.0.jar"
+}

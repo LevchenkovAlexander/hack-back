@@ -1,8 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://time_manage_db:5432/botinki
-    username: botinki
-    password: botinki
+    datasource:
+    url: ${DATABASE_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:

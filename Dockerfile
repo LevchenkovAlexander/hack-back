@@ -1,10 +1,9 @@
-# Сборка
 FROM eclipse-temurin:21-jdk-alpine AS builder
+RUN apk add --no-cache maven
 WORKDIR /app
 COPY . .
-RUN mvn clean package -DskipTests  # Maven wrapper, или mvn
+RUN mvn clean package -DskipTests
 
-# Запуск
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar

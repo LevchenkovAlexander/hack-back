@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://time_manage_db:5432/botinki    # ← 5432, а не 24241!
+    username: botinki
+    password: botinki
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        # ← ЭТИ ДВЕ СТРОЧКИ — КРИТИЧНО! camelCase без подчёркиваний
+        entityManagerFactoryInterface: jakarta.persistence.EntityManagerFactory
+        sessionFactoryInterface: org.hibernate.SessionFactory
+
+server:
+  port: 25251
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    com.hack.botinki: DEBUG
+
+max:
+  bot: 
+    token: t424_hakaton_botf9LHodD0cOJ6Jy-WoRkcldBDgZ2cvifn3rvYs-UMKLvYF7v231WVWgyyUDcX3VIk99XqZKfTmw_1GyEtTpe3
+  api:
+    url: https://platform-api.max.ru
+  app:
+    url: https://your-mini-app-domain.com/app?user_id=

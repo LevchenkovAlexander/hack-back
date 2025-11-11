@@ -1,7 +1,12 @@
-FROM eclipse-temurin:21-jdk
+# Сборка
+FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
-COPY target/demo-1.0.0.jar app.jar
-EXPOSE 8080
+COPY . .
+RUN ./mvnw clean package -DskipTests  # Maven wrapper, или mvn
 
-# Запускаем приложение
+# Запуск
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE $PORT
 ENTRYPOINT ["java", "-jar", "app.jar"]

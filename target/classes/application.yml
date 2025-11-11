@@ -1,5 +1,4 @@
 spring:
-  datasource:
     datasource:
     url: ${DATABASE_URL}
     username: ${POSTGRES_USER}

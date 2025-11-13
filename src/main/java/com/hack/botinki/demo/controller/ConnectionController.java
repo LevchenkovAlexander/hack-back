@@ -12,7 +12,6 @@ import com.hack.botinki.demo.shared.GenerateOrderResponse;
 import com.hack.botinki.demo.shared.ResultRequest;
 import com.hack.botinki.demo.shared.TaskTO;
 
-import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -188,29 +186,29 @@ public class ConnectionController {
     }
 
     // === ТЕСТОВЫЙ ECHO ===
-    @RequestMapping(value = "/echo", method = {
-        RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
-        RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS
-    })
-    public ResponseEntity<Map<String, Object>> echoRequest(
-            @RequestBody(required = false) String body,
-            @RequestHeader Map<String, String> headers,
-            HttpServletRequest request) {
+    // @RequestMapping(value = "/echo", method = {
+    //     RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+    //     RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS
+    // })
+    // public ResponseEntity<Map<String, Object>> echoRequest(
+    //         @RequestBody(required = false) String body,
+    //         @RequestHeader Map<String, String> headers,
+    //         HttpServletRequest request) {
 
-        log.info("==== ECHO ENDPOINT ====");
-        log.info("Method: {}", request.getMethod());
-        log.info("Path: {}", request.getRequestURI());
-        log.info("Headers: {}", headers);
-        log.info("Body: {}", body);
+    //     log.info("==== ECHO ENDPOINT ====");
+    //     log.info("Method: {}", request.getMethod());
+    //     log.info("Path: {}", request.getRequestURI());
+    //     log.info("Headers: {}", headers);
+    //     log.info("Body: {}", body);
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("method", request.getMethod());
-        response.put("path", request.getRequestURI());
-        response.put("headers", headers);
-        response.put("body", body);
+    //     Map<String, Object> response = new LinkedHashMap<>();
+    //     response.put("method", request.getMethod());
+    //     response.put("path", request.getRequestURI());
+    //     response.put("headers", headers);
+    //     response.put("body", body);
 
-        return ResponseEntity.ok(response);
-    }
+    //     return ResponseEntity.ok(response);
+    // }
 
     // === Health check ===
     @GetMapping("/health")

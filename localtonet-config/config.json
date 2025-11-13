@@ -1,0 +1,10 @@
+{
+    "tunnels": [
+    {
+      "id": "1",
+      "type": "http",
+      "port": 8080,
+      "subdomain": "capi-bot"
+    }
+  ]
+}

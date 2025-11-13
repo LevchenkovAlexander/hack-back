@@ -3,6 +3,8 @@ package com.hack.botinki.demo.shared;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,6 +15,11 @@ public class TaskTO {
     private String name;
     private String deadline;
     private Double estimatedHours;
+
+    @JsonSetter("Uid")
+    public void setUid(String uid) {
+        this.Uid = uid != null ? Long.valueOf(uid) : null;
+    }
 
     public LocalDate getDeadline() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");

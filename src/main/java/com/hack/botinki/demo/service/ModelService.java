@@ -16,6 +16,7 @@ import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,23 +36,27 @@ public class ModelService {
 	private ModelEvaluator<?> evaluator;
 	
 	public ModelService(UserService userService, ProxyService proxyService) {
-		 this.proxyService = proxyService;
-		 this.userService = userService;	
+		this.proxyService = proxyService;
+		this.userService = userService;
 
-		 PMML pmml;
-		 try {
-			pmml = PMMLUtil.unmarshal(new FileInputStream(new File("resources/model.pmml")));
+		try (InputStream is = getClass().getClassLoader().getResourceAsStream("model.pmml")) {
+			if (is == null) {
+				throw new FileNotFoundException("Файл model.pmml не найден в src/main/resources");
+			}
+
+			PMML pmml = PMMLUtil.unmarshal(is);
 			Model model = pmml.getModels().get(0);
-			ModelEvaluator<?> evaluator = ModelEvaluatorFactory.newInstance()
-				    .newModelEvaluator(pmml, model);
-			evaluator.verify();
-			this.evaluator = evaluator;
-			///логи прописать
-		 } catch (FileNotFoundException | ParserConfigurationException | SAXException | JAXBException e) {
-			///здесь тож
+
+			this.evaluator = ModelEvaluatorFactory.newInstance()
+									.newModelEvaluator(pmml, model);
+			// this.evaluator.verify();
+
+			System.out.println("Модель PMML успешно загружена и инициализирована");
+
+		} catch (Exception e) {
 			e.printStackTrace();
-		 }
-		 	
+			throw new IllegalStateException("Не удалось загрузить модель PMML", e);
+		}
 	}
 	
 	
@@ -78,10 +83,10 @@ public class ModelService {
 		
 		Map<String, Object>	data = new HashMap<>();
 		data.put("days_until_deadline", dud);
-		data.put("task_est_hours", task.getEstimatedHours());
-		data.put("free_hours", freeHours);
+		data.put("free_hours", (double) freeHours);
+		data.put("task_complexity", task.getEstimatedHours());
 		
-	    
+	    evaluator.verify();
 	    Map<String, ?> results = evaluator.evaluate(data);
 	    
 	    List<TargetField> targetFields = evaluator.getTargetFields();

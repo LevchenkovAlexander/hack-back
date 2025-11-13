@@ -23,7 +23,7 @@ public class ProxyService {
         this.taskService = taskService;
     }
 
-    public void addInstance(Long taskId, Long userId){ 
+    public void addInstance(Long userId, Long taskId){ 
         Proxy inst = new Proxy();
         inst.setTaskId(taskId);
         inst.setUserId(userId);

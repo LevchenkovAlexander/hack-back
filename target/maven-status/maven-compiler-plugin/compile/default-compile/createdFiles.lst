@@ -33,6 +33,7 @@ com\hack\botinki\demo\shared\ResultRequest.class
 com\hack\botinki\demo\exception\TaskNotFoundException.class
 com\hack\botinki\demo\max\MaxBotController.class
 com\hack\botinki\demo\max\MaxModels$WebApp.class
+com\hack\botinki\demo\config\CorsFilterConfig.class
 com\hack\botinki\demo\max\MaxProperties$MaxBotProperties.class
 com\hack\botinki\demo\max\MaxModels$MaxRecipient.class
 com\hack\botinki\demo\max\MaxBotService.class

@@ -73,6 +73,7 @@ public class ConnectionController {
 
         try {
             Long Uid = request.getUid();
+
             // Обновляем свободные часы, если они переданы в запросе
             if (request.getFreeHours() != null) {
                 try {
@@ -137,7 +138,7 @@ public class ConnectionController {
 
     // === Сохранение свободных часов ===
     @PostMapping("/free-hours")
-    public ResponseEntity<Void> submitFreeHours(@RequestBody FreeHoursRequest freeHoursRequest) {
+    public ResponseEntity<Map<String, Boolean>> submitFreeHours(@RequestBody FreeHoursRequest freeHoursRequest) {
         log.info("submitFreeHours вызван: Uid = {}, freeHours = {}", freeHoursRequest.getUid(), freeHoursRequest.getFreeHours());
 
         try {
@@ -149,7 +150,7 @@ public class ConnectionController {
             userService.addUser(user);
 
             log.info("Свободные часы обновлены: Uid = {}, freeHours = {}", Uid, freeHours);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("ok", true));
         } catch (Exception e) {
             log.error("Ошибка при сохранении свободных часов", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

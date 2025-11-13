@@ -8,4 +8,5 @@ import lombok.Data;
 public class GenerateOrderRequest {
     private List<TaskTO> tasks;
     private Long Uid;
+    private Integer freeHours; // опциональное поле для обновления свободных часов
 }

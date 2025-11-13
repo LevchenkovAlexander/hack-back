@@ -1,5 +1,6 @@
 package com.hack.botinki.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,12 @@ public class ProxyService {
     
     private final ProxyRepository proxyRepository;
 
+    private final TaskService taskService;
+
     @Autowired
-    ProxyService (ProxyRepository proxyRepository){
+    ProxyService (ProxyRepository proxyRepository, TaskService taskService){
         this.proxyRepository=proxyRepository;
+        this.taskService = taskService;
     }
 
     public void addInstance(Long taskId, Long userId){ 
@@ -27,6 +31,10 @@ public class ProxyService {
     }
     
     public List<Task> getTasksByUserId(Long userId){
-        return proxyRepository.findByUserId(userId);
+        List<Task> tasks= new ArrayList<>();
+        for (Proxy proxy : proxyRepository.findByUserId(userId)) {
+            tasks.add(taskService.getTask(proxy.getTaskId()));
+        }
+        return tasks;
     }
 }

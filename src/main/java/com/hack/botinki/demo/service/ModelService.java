@@ -3,6 +3,7 @@ package com.hack.botinki.demo.service;
 import org.dmg.pmml.Model;
 import org.dmg.pmml.PMML;
 import org.jpmml.model.PMMLUtil;
+import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -25,16 +26,15 @@ import org.jpmml.evaluator.ModelEvaluator;
 import org.jpmml.evaluator.ModelEvaluatorFactory;
 import org.jpmml.evaluator.TargetField;
 
+@Service
 public class ModelService {
 	
-	private final TaskService taskService;
 	private final UserService userService;
 	private final ProxyService proxyService;
 
 	private ModelEvaluator<?> evaluator;
 	
-	public ModelService(TaskService taskService, UserService userService, ProxyService proxyService) {
-		 this.taskService = taskService;
+	public ModelService(UserService userService, ProxyService proxyService) {
 		 this.proxyService = proxyService;
 		 this.userService = userService;	
 

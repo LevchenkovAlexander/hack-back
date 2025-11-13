@@ -2,7 +2,6 @@ package com.hack.botinki.demo.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,10 +21,10 @@ public class User {
     @Id
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer freeTime;
 
     // Связь через proxy таблицу

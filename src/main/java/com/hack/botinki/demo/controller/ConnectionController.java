@@ -95,7 +95,7 @@ public class ConnectionController {
             }
 
             GenerateOrderResponse response = new GenerateOrderResponse();
-            response.setOrderedTasks(optimizedTasks.reversed());
+            response.setOrderedTasks(optimizedTasks);
 
             log.info("generate-order успешен: {} задач", optimizedTasks.size());
             return ResponseEntity.ok(response);
@@ -157,7 +157,7 @@ public class ConnectionController {
 
     // === Обновление результата ===
     @PostMapping("/result")
-    public ResponseEntity<Void> submitResult(@RequestBody ResultRequest request) {
+    public ResponseEntity<Map<String, Boolean>> submitResult(@RequestBody ResultRequest request) {
         log.info("submitResult вызван: Uid = {}, number = {}", request.getUid(), request.getNumber());
 
         try {
@@ -178,7 +178,7 @@ public class ConnectionController {
                 log.info("Задача обновлена ({}%): ID = {}, newHours = {}", percent, idToChange, taskToChange.getEstimatedHours());
             }
 
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return  ResponseEntity.status(HttpStatus.CREATED).body(Map.of("ok", true));
         } catch (Exception e) {
             log.error("Ошибка при обновлении результата", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

@@ -18,6 +18,7 @@ public class CorsFilterConfig {
 
         // РАЗРЕШАЕМ VERСEL
         config.addAllowedOriginPattern("https://hack-front-v1-*-levchenkovalexanders-projects.vercel.app");
+        config.addAllowedOrigin("https://hack-front-v1.vercel.app/");
         config.addAllowedOriginPattern("http://localhost:3000");
 
         // РАЗРЕШАЕМ ВСЁ

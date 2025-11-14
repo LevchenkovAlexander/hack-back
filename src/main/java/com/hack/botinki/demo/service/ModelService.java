@@ -1,120 +1,118 @@
 package com.hack.botinki.demo.service;
 
-import org.dmg.pmml.Model;
-import org.dmg.pmml.PMML;
-import org.jpmml.model.PMMLUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 import com.hack.botinki.demo.entity.Task;
 import com.hack.botinki.demo.entity.User;
 
-import jakarta.xml.bind.JAXBException;
+import ai.onnxruntime.OnnxTensor;
+import ai.onnxruntime.OrtEnvironment;
+import ai.onnxruntime.OrtSession;
+
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.nio.FloatBuffer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.jpmml.evaluator.LoadingModelEvaluatorBuilder;
-import org.jpmml.evaluator.ModelEvaluator;
-import org.jpmml.evaluator.ModelEvaluatorFactory;
-import org.jpmml.evaluator.TargetField;
+
 
 @Service
 public class ModelService {
   
-  private final UserService userService;
-  private final ProxyService proxyService;
 
-  private ModelEvaluator<?> evaluator;
+    private final UserService userService;
+    private final ProxyService proxyService;
+    private OrtEnvironment env;
+    private OrtSession session;
   
-  public ModelService(UserService userService, ProxyService proxyService) {
-    this.proxyService = proxyService;
-    this.userService = userService;
-    
-    try {
-            // Загружаем PMML модель
-            InputStream is = getClass().getClassLoader().getResourceAsStream("model.pmml");
-            if (is == null) {
-                throw new RuntimeException("Файл model.pmml не найден в classpath");
-            }
-            
-            PMML pmml = PMMLUtil.unmarshal(is);
-            Model model = pmml.getModels().get(0); 
-            this.evaluator = ModelEvaluatorFactory.newInstance().newModelEvaluator(pmml, model);
-            this.evaluator.verify();
-            
-            this.evaluator.verify();
-            System.out.println("Модель PMML успешно загружена и инициализирована");
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalStateException("Не удалось загрузить модель PMML", e);
-        }
-  }
-  
-  
-  public long[] execute(Long id) {
-    List<Task> tasks = proxyService.getTasksByUserId(id);
-    
-    User user = userService.getUser(id);
-    Integer freeHours = user.getFreeTime();
-    
-    long[] taskIds = tasks.stream()
-          .map(task -> Map.entry(task.getId(), predict(task, freeHours)))
-          .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
-          .mapToLong(Map.Entry::getKey)
-          .toArray();
-    return taskIds;
-  }
-  
-  private Double predict(Task task, Integer freeHours) {
-    ModelEvaluator<?> evaluator = this.evaluator;
-    
-    LocalDate deadline = task.getDeadline();
-    LocalDate now = LocalDate.now();
-    long dud = ChronoUnit.DAYS.between(now, deadline);
-    
-    Map<String, Object> inputData = new HashMap<>();
-        inputData.put("days_until_deadline", (float) dud);
-        inputData.put("task_complexity", task.getEstimatedHours()/20);
-        inputData.put("free_hours", (float) freeHours);
-        
-    
+    @Autowired
+    public ModelService(UserService userService, ProxyService proxyService) {
+        this.userService = userService;
+        this.proxyService = proxyService;
         try {
-            Map<String, ?> results = evaluator.evaluate(inputData);
-            
-            List<TargetField> targetFields = evaluator.getTargetFields();
-            if (targetFields.isEmpty()) {
-                throw new IllegalStateException("Модель не имеет целевых полей");
+            env = OrtEnvironment.getEnvironment();
+
+            // Загружаем файл из ресурсов
+            InputStream modelStream = getClass().getClassLoader().getResourceAsStream("model.onnx");
+            if (modelStream == null) {
+                throw new RuntimeException("model.onnx не найден в resources");
             }
-            
-            String targetFieldName = targetFields.get(0).getName();
-            Object prediction = results.get(targetFieldName);
-            
-            Double priority;
-            if (prediction instanceof Number) {
-                priority = ((Number) prediction).doubleValue();
-            } else {
-                throw new IllegalStateException("Предсказание имеет нечисловой тип: " + prediction.getClass());
+
+            // Сохраняем временно в файл, т.к. ONNXRuntime требует путь на диске
+            File tempFile = File.createTempFile("model", ".onnx");
+            tempFile.deleteOnExit();
+            try (FileOutputStream out = new FileOutputStream(tempFile)) {
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = modelStream.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
             }
-            
-            task.setPriority(priority);
-            return priority;
-            
+
+            session = env.createSession(tempFile.getAbsolutePath(), new OrtSession.SessionOptions());
+            System.out.println("ONNX модель успешно загружена");
+
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Ошибка при выполнении предсказания для задачи: " + task.getId(), e);
+            throw new RuntimeException("Не удалось загрузить ONNX модель", e);
         }
     }
+
+    
+
+    public double predict(Task task, Integer freeHours) {
+        try {
+            // Рассчитываем days_until_deadline
+            LocalDate now = LocalDate.now();
+            long dud = ChronoUnit.DAYS.between(now, task.getDeadline());
+
+            // Подготавливаем входной массив
+            float[] inputData = new float[3];
+            inputData[0] = (float) dud;                     // days_until_deadline
+            inputData[1] = task.getEstimatedHours().floatValue(); // task_complexity
+            inputData[2] = freeHours.floatValue();         // free_hours
+
+            // Создаём ONNX тензор
+            OnnxTensor tensor = OnnxTensor.createTensor(env, FloatBuffer.wrap(inputData), new long[]{1, 3});
+
+            // Выполняем предсказание
+            OrtSession.Result result = session.run(Collections.singletonMap(session.getInputNames().iterator().next(), tensor));
+            float[][] output = (float[][]) result.get(0).getValue();
+
+            double priority = output[0][0];
+            task.setPriority(priority);
+
+            return priority;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка при выполнении предсказания", e);
+        }
+    }
+    
+    public long[] execute(Long id) {
+        List<Task> tasks = proxyService.getTasksByUserId(id);
+        
+        User user = userService.getUser(id);
+        Integer freeHours = user.getFreeTime();
+        
+        long[] taskIds = tasks.stream()
+            .map(task -> Map.entry(task.getId(), predict(task, freeHours)))
+            .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
+            .mapToLong(Map.Entry::getKey)
+            .toArray();
+        return taskIds;
+    }
+    
+    
   
   
 }

@@ -79,6 +79,12 @@
 		    <version>1.7.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.microsoft.onnxruntime</groupId>
+			<artifactId>onnxruntime</artifactId>
+			<version>1.23.2</version>
+		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/org.jpmml/pmml-evaluator -->
 		<dependency>

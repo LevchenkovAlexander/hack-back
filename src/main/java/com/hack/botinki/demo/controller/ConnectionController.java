@@ -175,7 +175,7 @@ public class ConnectionController {
             } else {
                 double percentd = Double.valueOf(percent);
                 double complexity = Double.valueOf(taskToChange.getComplexity());
-                taskToChange.setEstimatedHours(complexity * percentd / 100);
+                taskToChange.setEstimatedHours(complexity * (100-percentd) / 100);
                 taskService.addTask(taskToChange);
                 log.info("Задача обновлена ({}%): ID = {}, newHours = {}", percent, idToChange, taskToChange.getEstimatedHours());
             }

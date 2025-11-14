@@ -8,7 +8,7 @@
 
 ```bash
 localtonet --authtoken gHyDh0KlEZrX7AwBGW3VJqCk4i1afSPY && ssh -p 223 zGt91FJ5EMxzLtHavwNOAbonzB9SUvJnYKmJDB2-S4d5oSqApdSy2y_newJ-YcAUdml_9z5DhzKmZumlm-LsfA@d5axrvjae.localto.net -R5911:127.0.0.1:8080
-
+```
 ## 2. Запуск проекта
 
 - Перейдите в папку с проектом `./backend`
@@ -17,3 +17,4 @@ localtonet --authtoken gHyDh0KlEZrX7AwBGW3VJqCk4i1afSPY && ssh -p 223 zGt91FJ5EM
 
 ```bash
 docker compose up --build
+```

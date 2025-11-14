@@ -1,4 +1,8 @@
 services:
+  bot:
+    build: ./bot
+    command: node bot.js
+
   db:
     image: postgres:16-alpine
     container_name: time_manage_db
@@ -27,8 +31,7 @@ services:
       SPRING_DATASOURCE_USERNAME: "pupuser"
       SPRING_DATASOURCE_PASSWORD: "botinki"
       SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
-
-
+  
 
 volumes:
   db_data:

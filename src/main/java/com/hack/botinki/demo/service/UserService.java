@@ -46,16 +46,15 @@ public class UserService {
      * Если нет — бросает UserNotFoundException.
      */
     public User getUser(Long id) {
-        log.info("getUser() вызван: ID = {}", id);
-        return userRepository.findById(id)
-                .map(user -> {
-                    log.info("Пользователь найден: ID = {}, freeTime = {}", user.getId(), user.getFreeTime());
-                    return user;
-                })
-                .orElseThrow(() -> {
-                    log.warn("Пользователь НЕ найден: ID = {}", id);
-                    return new UserNotFoundException(id);
-                });
+        log.info("getOrCreateUser() вызван: ID = {}", id);
+        return userRepository.findById(id).orElseGet(() -> {
+            log.info("Пользователь не найден, создаём: ID = {}", id);
+            User newUser = new User();
+            newUser.setId(id);
+            newUser.setFreeTime(0);
+            addUser(newUser);
+            return newUser;
+        });
     }
 
     /**

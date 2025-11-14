@@ -30,7 +30,10 @@ logging:
 max:
   bot: 
     token: f9LHodD0cOJ6Jy-WoRkcldBDgZ2cvifn3rvYs-UMKLvYF7v231WVWgyyUDcX3VIk99XqZKfTmw_1GyEtTpe3
+    verify-token: capi-capi-token-00
   api:
     url: https://platform-api.max.ru
   app:
-    url: https://hack-front-v1-git-main-levchenkovalexanders-projects.vercel.app?_vercel_share=3ZJhNIbWBqc2ua6ktpSzSgS0a9cBXpYe/app?user_id=
+    url: https://hack-front-v1.vercel.app/?user_id=
+
+

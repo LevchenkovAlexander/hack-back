@@ -113,6 +113,7 @@ public class ConnectionController {
 
         try {
             Long Uid = taskRequest.getUid();
+            User user = userService.getUser(Uid);
             Task taskToDB = new Task();
             taskToDB.setName(taskRequest.getName());
             taskToDB.setDeadline(taskRequest.getDeadline());
@@ -162,6 +163,7 @@ public class ConnectionController {
 
         try {
             Long Uid = request.getUid();
+            User user = userService.getUser(Uid);
             long[] taskIds = modelService.execute(Uid);
             Long idToChange = taskIds[request.getNumber() - 1];
             Task taskToChange = taskService.getTask(idToChange);
@@ -232,7 +234,7 @@ public class ConnectionController {
 
     // === Получить информацию о пользователе ===
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Map<String, Object>> getUser(@PathVariable Long userId) {
+    public ResponseEntity<Map<String, Object>> getOrCreateUser(@PathVariable Long userId) {
         log.info("getUser вызван: userId = {}", userId);
         
         try {
